@@ -3,10 +3,10 @@
 namespace ArkeLogic {
     public class Program {
         public static void Main() {
-            var a = new ExternalInput();
-            var b = new ExternalInput();
+            var a = new Line();
+            var b = new Line();
 
-            var gate = new NxorGate(a, b);
+            var gate = new HalfAdder(a, b);
 
             while (true) {
                 var aa = Console.ReadKey();
@@ -19,7 +19,7 @@ namespace ArkeLogic {
 
                 gate.Tick();
 
-                Console.WriteLine(gate.Value ? "1" : "0");
+                Console.WriteLine($"S: {(gate.Sum.Value ? "1" : "0")}, C: {(gate.Carry.Value ? "1" : "0")}");
             }
         }
     }
@@ -28,7 +28,7 @@ namespace ArkeLogic {
         bool Value { get; }
     }
 
-    public sealed class ExternalInput : ILine {
+    public sealed class Line : ILine {
         public bool Value { get; set; }
     }
 
@@ -139,6 +139,30 @@ namespace ArkeLogic {
             this.notGate.Tick();
 
             return this.notGate.Value;
+        }
+    }
+
+    public class HalfAdder : IC {
+        private readonly ILine a;
+        private readonly ILine b;
+        private readonly Line sum;
+        private readonly Line carry;
+        private readonly XorGate xorGate;
+        private readonly AndGate andGate;
+
+        public ILine Sum => this.xorGate;
+        public ILine Carry => this.andGate;
+
+        public HalfAdder(ILine a, ILine b) {
+            (this.a, this.b, this.sum, this.carry) = (a, b, new Line(), new Line());
+
+            this.xorGate = new XorGate(this.a, this.b);
+            this.andGate = new AndGate(this.a, this.b);
+        }
+
+        public override void Tick() {
+            this.xorGate.Tick();
+            this.andGate.Tick();
         }
     }
 }
