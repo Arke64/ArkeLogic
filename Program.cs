@@ -5,21 +5,25 @@ namespace ArkeLogic {
         public static void Main() {
             var a = new Line();
             var b = new Line();
+            var c = new Line();
 
-            var gate = new HalfAdder(a, b);
+            var gate = new FullAdder(a, b, c);
 
             while (true) {
                 var aa = Console.ReadKey();
                 Console.Write(" ");
                 var bb = Console.ReadKey();
                 Console.Write(" ");
+                var cc = Console.ReadKey();
+                Console.Write(" ");
 
                 a.Value = aa.KeyChar == '1';
                 b.Value = bb.KeyChar == '1';
+                c.Value = cc.KeyChar == '1';
 
                 gate.Tick();
 
-                Console.WriteLine($"S: {(gate.Sum.Value ? "1" : "0")}, C: {(gate.Carry.Value ? "1" : "0")}");
+                Console.WriteLine($"S: {(gate.Carry.Value ? "1" : "0")}, C: {(gate.Sum.Value ? "1" : "0")}");
             }
         }
     }
@@ -163,6 +167,34 @@ namespace ArkeLogic {
         public override void Tick() {
             this.xorGate.Tick();
             this.andGate.Tick();
+        }
+    }
+
+    public class FullAdder : IC {
+        private readonly ILine a;
+        private readonly ILine b;
+        private readonly ILine carryIn;
+        private readonly Line sum;
+        private readonly Line carry;
+        private readonly HalfAdder adder1;
+        private readonly HalfAdder adder2;
+        private readonly OrGate orGate;
+
+        public ILine Sum => this.adder2.Sum;
+        public ILine Carry => this.orGate;
+
+        public FullAdder(ILine a, ILine b, ILine carryIn) {
+            (this.a, this.b, this.carryIn, this.sum, this.carry) = (a, b, carryIn, new Line(), new Line());
+
+            this.adder1 = new HalfAdder(this.a, this.b);
+            this.adder2 = new HalfAdder(this.carryIn, this.adder1.Sum);
+            this.orGate = new OrGate(this.adder1.Carry, this.adder2.Carry);
+        }
+
+        public override void Tick() {
+            this.adder1.Tick();
+            this.adder2.Tick();
+            this.orGate.Tick();
         }
     }
 }
