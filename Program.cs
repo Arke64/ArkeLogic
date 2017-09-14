@@ -45,51 +45,50 @@ namespace ArkeLogic {
     }
 
     public class NotGate : Gate {
-        public ILine I { get; }
+        private readonly ILine i;
 
-        public NotGate(ILine i) => this.I = i;
+        public NotGate(ILine i) => this.i = i;
 
-        protected override bool OnTick() => !this.I.Value;
+        protected override bool OnTick() => !this.i.Value;
     }
 
     public class AndGate : Gate {
-        public ILine A { get; }
-        public ILine B { get; }
+        private readonly ILine a;
+        private readonly ILine b;
 
-        public AndGate(ILine a, ILine b) => (this.A, this.B) = (a, b);
+        public AndGate(ILine a, ILine b) => (this.a, this.b) = (a, b);
 
-        protected override bool OnTick() => this.A.Value && this.B.Value;
+        protected override bool OnTick() => this.a.Value && this.b.Value;
     }
 
     public class OrGate : Gate {
-        public ILine A { get; }
-        public ILine B { get; }
+        private readonly ILine a;
+        private readonly ILine b;
 
-        public OrGate(ILine a, ILine b) => (this.A, this.B) = (a, b);
+        public OrGate(ILine a, ILine b) => (this.a, this.b) = (a, b);
 
-        protected override bool OnTick() => this.A.Value || this.B.Value;
+        protected override bool OnTick() => this.a.Value || this.b.Value;
     }
 
     public class XorGate : Gate {
-        public ILine A { get; }
-        public ILine B { get; }
+        private readonly ILine a;
+        private readonly ILine b;
 
-        public XorGate(ILine a, ILine b) => (this.A, this.B) = (a, b);
+        public XorGate(ILine a, ILine b) => (this.a, this.b) = (a, b);
 
-        protected override bool OnTick() => this.A.Value ^ this.B.Value;
+        protected override bool OnTick() => this.a.Value ^ this.b.Value;
     }
 
     public class NandGate : Gate {
+        private readonly ILine a;
+        private readonly ILine b;
         private readonly AndGate andGate;
         private readonly NotGate notGate;
 
-        public ILine A { get; }
-        public ILine B { get; }
-
         public NandGate(ILine a, ILine b) {
-            (this.A, this.B) = (a, b);
+            (this.a, this.b) = (a, b);
 
-            this.andGate = new AndGate(this.A, this.B);
+            this.andGate = new AndGate(this.a, this.b);
             this.notGate = new NotGate(this.andGate);
         }
 
@@ -102,16 +101,15 @@ namespace ArkeLogic {
     }
 
     public class NorGate : Gate {
+        private readonly ILine a;
+        private readonly ILine b;
         private readonly OrGate orGate;
         private readonly NotGate notGate;
 
-        public ILine A { get; }
-        public ILine B { get; }
-
         public NorGate(ILine a, ILine b) {
-            (this.A, this.B) = (a, b);
+            (this.a, this.b) = (a, b);
 
-            this.orGate = new OrGate(this.A, this.B);
+            this.orGate = new OrGate(this.a, this.b);
             this.notGate = new NotGate(this.orGate);
         }
 
@@ -124,16 +122,15 @@ namespace ArkeLogic {
     }
 
     public class NxorGate : Gate {
+        private readonly ILine a;
+        private readonly ILine b;
         private readonly XorGate xorGate;
         private readonly NotGate notGate;
 
-        public ILine A { get; }
-        public ILine B { get; }
-
         public NxorGate(ILine a, ILine b) {
-            (this.A, this.B) = (a, b);
+            (this.a, this.b) = (a, b);
 
-            this.xorGate = new XorGate(this.A, this.B);
+            this.xorGate = new XorGate(this.a, this.b);
             this.notGate = new NotGate(this.xorGate);
         }
 
